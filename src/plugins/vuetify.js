@@ -20,6 +20,16 @@ export default createVuetify({
     adapter: createVueI18nAdapter({ i18n, useI18n }),
   },
   theme: {
-    defaultTheme: 'dark',
+    defaultTheme: 'pink',
+    themes: {
+      pink: {
+        dark: false, // 如果需要深色模式，设置为 true
+        colors: {
+          primary: '#E8B4B8', // 设置主题主色，导航列默认会继承 primary
+          secondary: '#FFC107', // 设置其他辅助颜色
+          appBarBackground: '#F06292', // 自定义导航列颜色
+        },
+      },
+    },
   },
 })

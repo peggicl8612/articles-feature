@@ -1,7 +1,11 @@
 <template>
-  <v-app-bar>
+  <v-app-bar
+    :style="{ backgroundColor: '#E8B4B8', color: 'white', fontSize: '36px', fontFamily: 'Junge' }"
+  >
     <v-container class="d-flex align-center">
-      <v-btn to="/" :active="false">購物網站</v-btn>
+      <v-btn to="/home" :active="false" :style="{ fontSize: '24px', fontFamily: 'Junge' }"
+        >咪凹屋</v-btn
+      >
       <v-spacer />
       <template v-for="nav of navs" :key="nav.to">
         <v-btn v-if="nav.show" :to="nav.to" :prepend-icon="nav.icon">
@@ -9,7 +13,9 @@
           <v-badge v-if="nav.to === '/cart'" :content="user.cart" floating color="red"></v-badge>
         </v-btn>
       </template>
-      <v-btn v-if="user.isLoggedIn" prepend-icon="mdi-account-arrow-right" @click="logout">{{ $t('nav.logout') }}</v-btn>
+      <v-btn v-if="user.isLoggedIn" prepend-icon="mdi-account-arrow-right" @click="logout">{{
+        $t('nav.logout')
+      }}</v-btn>
       <v-menu>
         <template #activator="{ props }">
           <v-btn v-bind="props">
@@ -17,10 +23,7 @@
           </v-btn>
         </template>
         <v-list>
-          <v-list-item
-            v-for="lang in langs" :key="lang.value"
-            @click="$i18n.locale = lang.value"
-          >
+          <v-list-item v-for="lang in langs" :key="lang.value" @click="$i18n.locale = lang.value">
             {{ lang.text }}
           </v-list-item>
         </v-list>
@@ -49,10 +52,17 @@ const router = useRouter()
 // 導覽列項目
 const navs = computed(() => {
   return [
+    { to: '/home', text: t('nav.home'), icon: 'mdi-home', show: true },
     { to: '/register', text: t('nav.register'), icon: 'mdi-account-plus', show: !user.isLoggedIn },
     { to: '/login', text: t('nav.login'), icon: 'mdi-account-arrow-left', show: !user.isLoggedIn },
+    { to: '/articles/article', text: t('nav.article'), icon: 'mdi-book', show: true},
     { to: '/cart', text: t('nav.cart'), icon: 'mdi-cart', show: user.isLoggedIn },
-    { to: '/orders', text: t('nav.orders'), icon: 'mdi-format-list-bulleted', show: user.isLoggedIn },
+    {
+      to: '/orders',
+      text: t('nav.orders'),
+      icon: 'mdi-format-list-bulleted',
+      show: user.isLoggedIn,
+    },
     { to: '/admin', text: t('nav.admin'), icon: 'mdi-cog', show: user.isLoggedIn && user.isAdmin },
   ]
 })
@@ -72,8 +82,8 @@ const logout = async () => {
   createSnackbar({
     text: t('logout.success'),
     snackbarProps: {
-      color: 'green'
-    }
+      color: 'green',
+    },
   })
   router.push('/')
 }

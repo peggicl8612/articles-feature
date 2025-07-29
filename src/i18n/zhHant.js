@@ -5,6 +5,7 @@ export default {
   nav: {
     register: '註冊',
     login: '登入',
+    article: '文章',
     cart: '購物車',
     orders: '訂單',
     admin: '管理',
@@ -16,11 +17,11 @@ export default {
   },
   register: {
     submit: '建立帳號',
-    success: '註冊成功'
+    success: '註冊成功',
   },
   login: {
     submit: '登入',
-    success: '登入成功'
+    success: '登入成功',
   },
   logout: {
     success: '登出成功',
@@ -29,7 +30,7 @@ export default {
     account: '帳號',
     email: '信箱',
     password: '密碼',
-    passwordConfirm: '確認密碼'
+    passwordConfirm: '確認密碼',
   },
   cart: {
     checkout: '結帳',
@@ -38,10 +39,10 @@ export default {
     createdAt: '訂單時間',
     cart: '商品',
     price: '訂單金額',
-    account: '帳號'
+    account: '帳號',
   },
   admin: {
-    index: '選擇管理項目'
+    index: '選擇管理項目',
   },
   adminProduct: {
     new: '新增商品',
@@ -70,12 +71,16 @@ export default {
     food: '食品',
     drink: '飲料',
     music: '音樂',
-    phone: '手機'
+    phone: '手機',
   },
   fileAgent: {
     helpText: '點擊或拖曳檔案至此',
     errorType: '檔案類型錯誤',
     errorSize: '檔案大小超過限制',
+  },
+  article: {
+    createSuccess: '新增文章成功',
+    editSuccess: '編輯文章成功',
   },
   api: {
     userAccountRequired: '使用者帳號必填',
@@ -97,6 +102,11 @@ export default {
     userPermissionDenied: '使用者權限不足',
     userTokenInvalid: '使用者驗證錯誤',
     userTokenExpired: '登入過期',
+    articleTitleRequired: '文章標題必填',
+    articleContentRequired: '文章內容必填',
+    articleImageRequired: '文章圖片必填',
+    articleIdInvalid: '文章 ID 錯誤',
+    articleNotFound: '查無文章',
     productIdInvalid: '商品 ID 錯誤',
     productNameRequired: '商品名稱必填',
     productPriceRequired: '商品價格必填',
@@ -120,4 +130,3 @@ export default {
     uploadFailed: '上傳失敗',
   },
 }
-

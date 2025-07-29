@@ -6,6 +6,7 @@
 
 // Plugins
 import vuetify from './vuetify'
+import ElementPlus from 'element-plus'
 import pinia from '@/stores'
 import router from '@/router'
 import i18n from '@/i18n'
@@ -17,6 +18,7 @@ export function registerPlugins (app) {
   app
     .use(i18n)
     .use(vuetify)
+    .use(ElementPlus)
     .use(VuetifyUseDialog, {
       snackbar: {
         showCloseButton: false,

@@ -9,17 +9,29 @@
         <v-img :src="product.image"></v-img>
       </v-col>
       <v-col cols="12" md="6">
-        <p>{{ $t( 'productCategory.'+ product.category) }}</p>
+        <p>{{ $t('productCategory.' + product.category) }}</p>
         <p>{{ product.price }}</p>
         <p>{{ product.description }}</p>
         <v-form :disabled="isSubmitting" @submit.prevent="submit">
-          <v-text-field v-model.number="quantity.value.value" type="number" :error-messages="quantity.errorMessage.value"></v-text-field>
-          <v-btn type="submit" prepend-icon="mdi-cart" :loading="isSubmitting">{{ $t('product.addCart') }}</v-btn>
+          <v-text-field
+            v-model.number="quantity.value.value"
+            type="number"
+            :error-messages="quantity.errorMessage.value"
+          ></v-text-field>
+          <v-btn type="submit" prepend-icon="mdi-cart" :loading="isSubmitting">{{
+            $t('product.addCart')
+          }}</v-btn>
         </v-form>
       </v-col>
     </v-row>
   </v-container>
-  <v-overlay :model-value="!product.sell" class="align-center justify-center" scrim="black" opacity="0.8" persistent>
+  <v-overlay
+    :model-value="!product.sell"
+    class="align-center justify-center"
+    scrim="black"
+    opacity="0.8"
+    persistent
+  >
     <h1 class="text-center">{{ $t('api.productNotOnSell') }}</h1>
   </v-overlay>
 </template>
@@ -48,14 +60,14 @@ const product = ref({
   description: '',
   image: '',
   sell: true,
-  category: 'food'
+  category: 'food',
 })
 
 const getProduct = async () => {
   try {
     const { data } = await api.get('/product/' + route.params.id)
     product.value = data.result
-    document.title = product.value.name + ' | 購物網站'
+    document.title = product.value.name + ' | 咪凹屋'
   } catch (error) {
     console.log(error)
     router.push('/')
@@ -69,13 +81,13 @@ const schema = yup.object({
     .typeError(t('product.addCartQuantityInvalid'))
     .required(t('product.addCartQuantityInvalid'))
     .positive(t('product.addCartQuantityInvalid'))
-    .integer(t('product.addCartQuantityInvalid'))
+    .integer(t('product.addCartQuantityInvalid')),
 })
 const { handleSubmit, isSubmitting } = useForm({
   validationSchema: schema,
   initialValues: {
-    quantity: 1
-  }
+    quantity: 1,
+  },
 })
 const quantity = useField('quantity')
 
@@ -87,22 +99,22 @@ const submit = handleSubmit(async (values) => {
   try {
     const { data } = await apiAuth.patch('/user/cart', {
       product: product.value._id,
-      quantity: values.quantity
+      quantity: values.quantity,
     })
     user.cart = data.result
     createSnackbar({
       text: t('product.addCartSuccess'),
       snackbarProps: {
-        color: 'green'
-      }
+        color: 'green',
+      },
     })
   } catch (error) {
     console.log(error)
     createSnackbar({
       text: t('api.' + (error?.response?.data?.message || 'unknownError')),
       snackbarProps: {
-        color: 'red'
-      }
+        color: 'red',
+      },
     })
   }
 })

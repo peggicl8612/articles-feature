@@ -11,10 +11,35 @@ import { routes } from 'vue-router/auto-routes'
 import { useAxios } from '@/composables/axios'
 import { useUserStore } from '@/stores/user'
 import i18n from '@/i18n'
+import adminHome from '@/pages/home.vue'
+import adminLayout from '@/layouts/adminLayout.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
-  routes: setupLayouts(routes),
+  routes: setupLayouts([
+    ...routes, // 自动生成的路由
+    {
+      path: '/admin',
+      component: adminLayout,
+      children: [
+        {
+          path: '',
+          name: 'Home',
+          component: adminHome,
+          meta: {
+            layout: 'admin',
+            login: true,
+            admin: true,
+            title: 'nav.admin',
+          },
+        },
+      ],
+    },
+    {
+      path: '/',
+      redirect: '/home',
+    },
+  ]),
 })
 
 router.beforeEach(async (to, from, next) => {
@@ -43,7 +68,7 @@ router.beforeEach(async (to, from, next) => {
 })
 
 router.afterEach((to) => {
-  document.title = i18n.global.t(to.meta.title) + ' | 購物網站'
+  document.title = i18n.global.t(to.meta.title) + ' | 咪凹屋'
 })
 
 // Workaround for https://github.com/vitejs/vite/issues/11804

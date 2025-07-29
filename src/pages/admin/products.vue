@@ -196,7 +196,7 @@ const categoryOptions = computed(() => [
   { text: t('productCategory.drink'), value: 'drink' },
   { text: t('productCategory.music'), value: 'music' },
   { text: t('productCategory.phone'), value: 'phone' },
-])
+])``
 
 const fileAgent = ref(null)
 const fileRecords = ref([])
