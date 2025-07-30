@@ -14,6 +14,7 @@
     "@mdi/font": "7.4.47",
     "axios": "^1.7.9",
     "element-plus": "^2.10.4",
+    "mongodb": "^6.18.0",
     "pinia-plugin-persistedstate": "^4.2.0",
     "roboto-fontface": "*",
     "validator": "^13.12.0",

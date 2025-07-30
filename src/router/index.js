@@ -23,7 +23,7 @@ const router = createRouter({
       component: adminLayout,
       children: [
         {
-          path: '',
+          path: '/home',
           name: 'Home',
           component: adminHome,
           meta: {
@@ -53,15 +53,17 @@ router.beforeEach(async (to, from, next) => {
     } catch (error) {
       console.log(error)
       user.logout()
+      next('/home')
+      return
     }
   }
 
   if (user.isLoggedIn && ['/login', '/register'].includes(to.path)) {
-    next('/')
+    next('/home')
   } else if (to.meta.login && !user.isLoggedIn) {
     next('/login')
   } else if (to.meta.admin && !user.isAdmin) {
-    next('/')
+    next('/home')
   } else {
     next()
   }

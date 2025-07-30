@@ -1,39 +1,41 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col cols="12">
-        <h1 class="text-center">{{ product.name }}</h1>
-      </v-col>
-      <v-divider></v-divider>
-      <v-col cols="12" md="6">
-        <v-img :src="product.image"></v-img>
-      </v-col>
-      <v-col cols="12" md="6">
-        <p>{{ $t('productCategory.' + product.category) }}</p>
-        <p>{{ product.price }}</p>
-        <p>{{ product.description }}</p>
-        <v-form :disabled="isSubmitting" @submit.prevent="submit">
-          <v-text-field
-            v-model.number="quantity.value.value"
-            type="number"
-            :error-messages="quantity.errorMessage.value"
-          ></v-text-field>
-          <v-btn type="submit" prepend-icon="mdi-cart" :loading="isSubmitting">{{
-            $t('product.addCart')
-          }}</v-btn>
-        </v-form>
-      </v-col>
-    </v-row>
-  </v-container>
-  <v-overlay
-    :model-value="!product.sell"
-    class="align-center justify-center"
-    scrim="black"
-    opacity="0.8"
-    persistent
-  >
-    <h1 class="text-center">{{ $t('api.productNotOnSell') }}</h1>
-  </v-overlay>
+  <div class="outer">
+    <v-container>
+      <v-row>
+        <v-col cols="12">
+          <h1 class="text-center">{{ product.name }}</h1>
+        </v-col>
+        <v-divider></v-divider>
+        <v-col cols="12" md="6">
+          <v-img :src="product.image"></v-img>
+        </v-col>
+        <v-col cols="12" md="6">
+          <p>{{ $t('productCategory.' + product.category) }}</p>
+          <p>{{ product.price }}</p>
+          <p>{{ product.description }}</p>
+          <v-form :disabled="isSubmitting" @submit.prevent="submit">
+            <v-text-field
+              v-model.number="quantity.value.value"
+              type="number"
+              :error-messages="quantity.errorMessage.value"
+            ></v-text-field>
+            <v-btn type="submit" prepend-icon="mdi-cart" :loading="isSubmitting">{{
+              $t('product.addCart')
+            }}</v-btn>
+          </v-form>
+        </v-col>
+      </v-row>
+    </v-container>
+    <v-overlay
+      :model-value="!product.sell"
+      class="align-center justify-center"
+      scrim="black"
+      opacity="0.8"
+      persistent
+    >
+      <h1 class="text-center">{{ $t('api.productNotOnSell') }}</h1>
+    </v-overlay>
+  </div>
 </template>
 
 <script setup>
