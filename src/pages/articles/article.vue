@@ -5,7 +5,7 @@
     <v-btn color="primary" class="mb-4" @click="openDialog('add')"> 新增文章 </v-btn>
 
     <!-- 文章列表 -->
-    <div class="mb-2">文章列表</div>
+    <div class="mb-2">LIST</div>
     <div v-if="articles.length === 0" class="text-grey">目前尚無文章</div>
 
     <v-card v-for="article in articles" :key="article._id" class="card mb-3">
@@ -22,9 +22,14 @@
         >
       </div>
       <v-card-text>
-        <span class="author font-weight-medium">作者：{{ user.account }}</span>
+        <div class="date">
+          <div>發布日期：{{ new Date(article.createdAt).toLocaleString() }}</div>
+          <div>更新日期：{{ new Date(article.updatedAt).toLocaleString() }}</div>
+        </div>
+      </v-card-text>
+      <v-card-text>
         <div class="author-test">
-          <div>作者：{{ article.author.account }}</div>
+          <div>作者：{{ article.author }}</div>
           <br />
           <div>目前登入者 ID：{{ user.id }}</div>
         </div>
@@ -41,7 +46,7 @@
       </div>
       <v-card-text class="article-content">{{ article.content }}</v-card-text>
       <v-card-actions class="d-flex justify-end">
-        <toggleLikeArticle
+        <ToggleLikeArticle
           :article-id="article._id"
           :initial-liked="article.liked"
           :initial-like-count="article.likes"
@@ -60,16 +65,14 @@
               <span class="ml-1">{{ likes }}</span>
             </v-btn>
           </template>
-        </toggleLikeArticle>
-        <v-btn icon @click="openDialog('comment', article)">
+        </ToggleLikeArticle>
+        <v-btn icon @click="openCommitDialog('comment', article._id)">
           <v-icon>mdi-comment-outline</v-icon>
         </v-btn>
-        <span class="mr-4">{{ article.comments?.length || 0 }}</span>
-        <!--       <v-btn icon @click="shareArticle(article)">
-          <v-icon>mdi-share-variant</v-icon>
-        </v-btn> -->
+        <span class="mr-4">{{ comments.length || 0 }}</span>
       </v-card-actions>
     </v-card>
+    <CommentArticle v-model:visible="commentDialogVisible" :article-id="selectedArticleId" />
 
     <!-- 新增/編輯文章組件 -->
     <AddOrEditArticle
@@ -88,7 +91,8 @@ import { useSnackbar } from 'vuetify-use-dialog'
 import { useI18n } from 'vue-i18n'
 import { useAxios } from '@/composables/axios'
 import AddOrEditArticle from './components/addOrEditArticle.vue'
-import toggleLikeArticle from './components/toggleLikeArticle.vue'
+import ToggleLikeArticle from './components/toggleLikeArticle.vue'
+import CommentArticle from './components/commentArticle.vue'
 import { useUserStore } from '@/stores/user'
 
 const user = useUserStore()
@@ -104,6 +108,17 @@ const showDialog = ref(false)
 const dialogMode = ref('add')
 const currentArticle = ref({})
 const currentEditId = ref('')
+
+const commentDialogVisible = ref(false)
+const selectedArticleId = ref(null)
+const comments = ref([])
+
+function openCommitDialog(type, articleId) {
+  if (type === 'comment') {
+    selectedArticleId.value = articleId
+    commentDialogVisible.value = true
+  }
+}
 
 const getArticles = async () => {
   try {
@@ -166,7 +181,7 @@ body {
   padding: 4vw;
 }
 .title {
-  font-size: 36px;
+  font-size: 40px;
   color: rgb(74, 67, 60);
 }
 .card {
@@ -198,5 +213,10 @@ body {
   align-items: flex-end;
   font-size: 10px;
   color: rgb(188, 173, 184);
+}
+
+.date {
+  font-size: 12px;
+  color: #7f7878;
 }
 </style>
