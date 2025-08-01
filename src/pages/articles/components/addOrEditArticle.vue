@@ -39,8 +39,8 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click="closeDialog">取消</v-btn>
           <v-btn color="primary" :loading="isSubmitting" type="submit">送出</v-btn>
+          <v-btn text @click="closeDialog">取消</v-btn>
         </v-card-actions>
       </v-card>
     </v-form>

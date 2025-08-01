@@ -20,6 +20,13 @@
           @click="openDialog('edit', article)"
           >編輯</v-btn
         >
+        <v-btn
+          v-if="article.author === user.id"
+          size="small"
+          variant="text"
+          @click="deleteArticle(article._id)"
+          >刪除</v-btn
+        >
       </div>
       <v-card-text>
         <div class="date">
@@ -44,7 +51,18 @@
           contain
         ></v-img>
       </div>
-      <v-card-text class="article-content">{{ article.content }}</v-card-text>
+      <v-card-text class="article-content" :class="{ clamped: !expandedArticles[article._id] }"
+        >{{ article.content }}
+      </v-card-text>
+      <div class="read-more-wrapper">
+        <v-btn
+          v-if="article.content.length > 50"
+          size="small"
+          variant="text"
+          @click="toggleExpanded(article._id)"
+          >{{ expandedArticles[article._id] ? '顯示更少' : '繼續閱讀' }}</v-btn
+        >
+      </div>
       <v-card-actions class="d-flex justify-end">
         <ToggleLikeArticle
           :article-id="article._id"
@@ -68,8 +86,9 @@
         </ToggleLikeArticle>
         <v-btn icon @click="openCommitDialog('comment', article._id)">
           <v-icon>mdi-comment-outline</v-icon>
+          <span>留言</span>
         </v-btn>
-        <span class="mr-4">{{ comments.length || 0 }}</span>
+        <!-- <span class="mr-4">{{ comments.length || 0 }}</span> -->
       </v-card-actions>
     </v-card>
     <CommentArticle v-model:visible="commentDialogVisible" :article-id="selectedArticleId" />
@@ -86,7 +105,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useSnackbar } from 'vuetify-use-dialog'
 import { useI18n } from 'vue-i18n'
 import { useAxios } from '@/composables/axios'
@@ -102,7 +121,7 @@ const { t } = useI18n()
 const { apiAuth } = useAxios()
 const createSnackbar = useSnackbar()
 
-const articles = reactive([])
+const articles = ref([])
 
 const showDialog = ref(false)
 const dialogMode = ref('add')
@@ -111,7 +130,8 @@ const currentEditId = ref('')
 
 const commentDialogVisible = ref(false)
 const selectedArticleId = ref(null)
-const comments = ref([])
+// 繼續閱讀
+const expandedArticles = ref({})
 
 function openCommitDialog(type, articleId) {
   if (type === 'comment') {
@@ -123,8 +143,12 @@ function openCommitDialog(type, articleId) {
 const getArticles = async () => {
   try {
     const { data } = await apiAuth.get('/article')
-    articles.splice(0)
-    articles.push(...data.result)
+    console.log(
+      '後端拿到的文章列表',
+      data.result.map((a) => a._id),
+    )
+    articles.value.splice(0)
+    articles.value.push(...data.result)
   } catch (error) {
     console.log(error)
     createSnackbar({
@@ -136,6 +160,7 @@ const getArticles = async () => {
   }
 }
 
+// 新增 & 編輯彈窗
 const openDialog = (mode, article = null) => {
   dialogMode.value = mode
   showDialog.value = true
@@ -151,6 +176,39 @@ const openDialog = (mode, article = null) => {
 const closeDialog = () => {
   showDialog.value = false
   currentArticle.value = {}
+}
+
+// 刪除文章
+const deleteArticle = async (articleId) => {
+  console.log('要刪除的 id:', articleId)
+  console.log(
+    '目前列表：',
+    articles.value.map((a) => a._id),
+  )
+  try {
+    await apiAuth.delete(`/article/${articleId}`)
+    articles.value = articles.value.filter((item) => item._id !== articleId)
+
+    createSnackbar({
+      text: '刪除成功',
+      snackbarProps: {
+        color: 'success',
+      },
+    })
+  } catch (error) {
+    console.log('刪除文章失敗', error)
+    createSnackbar({
+      text: '已刪除文章',
+      snackbarProps: {
+        color: 'gray',
+      },
+    })
+  }
+}
+
+// 繼續閱讀/顯示更好 切換功能
+function toggleExpanded(articleId) {
+  expandedArticles.value[articleId] = !expandedArticles.value[articleId]
 }
 
 // 初始化載入文章
@@ -199,8 +257,7 @@ body {
 }
 
 .article-content {
-  height: 20vh;
-  color: rgb(41, 38, 36);
+  color: rgb(96, 88, 83);
 }
 
 .author {
@@ -218,5 +275,22 @@ body {
 .date {
   font-size: 12px;
   color: #7f7878;
+}
+</style>
+
+<style>
+.clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.read-more-wrapper {
+  padding: 1rem;
+  display: flex;
+  justify-content: end;
+  text-decoration: underline;
+  color: rgb(133, 130, 123);
 }
 </style>

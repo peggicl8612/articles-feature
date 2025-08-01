@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialogVisible" width="80vw" height="80vh">
     <v-card>
-      <v-card-title class="text-h6">留言</v-card-title>
+      <v-card-title class="text-h6 text-center">留言</v-card-title>
 
       <v-card-text v-if="comments.length">
         <div v-for="comment in comments" :key="comment._id" class="mb-2">
@@ -14,6 +14,7 @@
               </template>
               <template v-else>
                 <v-btn @click="startEdit(comment._id, comment.content)">編輯</v-btn>
+                <v-btn @click="removeComment(comment._id, comment.content)">刪除</v-btn>
               </template>
             </div>
           </div>
@@ -75,6 +76,7 @@ const comments = ref([])
 const isSubmitting = ref(false)
 const loading = ref(false)
 const editingMap = ref({})
+const deleteMap = ref({})
 
 async function getComments() {
   if (!props.articleId) return
@@ -151,6 +153,21 @@ async function submitComment() {
 
 function cancelComment() {
   dialogVisible.value = false
+}
+async function removeComment(id) {
+  const content = deleteMap.value[id]
+  try {
+    await apiAuth.delete(`/article/${props.articleId}/comment/${id}`, { content })
+    await getComments()
+  } catch (error) {
+    console.log('刪除失敗', error)
+    createSnackbar({
+      text: '編輯失敗',
+      snackbarPropsP: {
+        color: 'red',
+      },
+    })
+  }
 }
 
 watch(
