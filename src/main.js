@@ -13,6 +13,9 @@ import App from './App.vue'
 // Composables
 import { createApp } from 'vue'
 
+// css
+import './assets/theme.css'
+
 const app = createApp(App)
 
 registerPlugins(app)

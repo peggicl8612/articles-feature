@@ -28,6 +28,9 @@
           </v-list-item>
         </v-list>
       </v-menu>
+      <v-btn @click="toggleTheme">
+        <v-icon>mdi-theme-light-dark</v-icon>
+      </v-btn>
     </v-container>
   </v-app-bar>
   <v-main>
@@ -36,18 +39,27 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/user'
 import { useAxios } from '@/composables/axios'
 import { useSnackbar } from 'vuetify-use-dialog'
 import { useRouter } from 'vue-router'
+import { useTheme } from 'vuetify'
 
 const { t } = useI18n()
 const user = useUserStore()
 const { apiAuth } = useAxios()
 const createSnackbar = useSnackbar()
 const router = useRouter()
+const isDark = ref(false)
+const theme = useTheme()
+
+function toggleTheme() {
+  isDark.value = !isDark.value
+  localStorage.setItem('theme', isDark.value ? 'dark' : 'pink')
+  theme.global.name.value = isDark.value ? 'dark' : 'pink'
+}
 
 // 導覽列項目
 const navs = computed(() => {
@@ -87,4 +99,10 @@ const logout = async () => {
   })
   router.push('/')
 }
+
+onMounted(() => {
+  const saved = localStorage.getItem('theme') || 'pink'
+  isDark.value = saved === 'dark'
+  theme.global.name.value = saved
+})
 </script>

@@ -6,7 +6,10 @@
       <v-card-text v-if="comments.length">
         <div v-for="comment in comments" :key="comment._id" class="mb-2">
           <div class="author-line">
-            <div>作者：{{ comment.author?._id || '匿名' }}</div>
+            <div class="commentAuthor">作者：{{ comment.author?._id || '匿名' }}</div>
+            <div class="commentDate">
+              留言時間：{{ new Date(comment.createdAt).toLocaleString() }}
+            </div>
             <div v-if="comment.author?._id === user.id">
               <template v-if="editingMap[comment._id] !== undefined">
                 <v-btn @click="saveEditedComment(comment._id)">儲存</v-btn>
@@ -194,6 +197,7 @@ watch(
 .author-line {
   display: flex;
   justify-content: space-between;
-  gap: 10rem;
+  gap: 1rem;
+  font-size: 14px;
 }
 </style>

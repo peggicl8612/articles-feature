@@ -1,16 +1,14 @@
 <template>
   <div class="container">
-    <div class="title text-center mb-4">Articles</div>
-
+    <div ref="titleRef" class="title text-center mb-4">Articles</div>
     <v-btn color="primary" class="mb-4" @click="openDialog('add')"> 新增文章 </v-btn>
-
     <!-- 文章列表 -->
     <div class="mb-2">LIST</div>
     <div v-if="articles.length === 0" class="text-grey">目前尚無文章</div>
 
-    <v-card v-for="article in articles" :key="article._id" class="card mb-3">
+    <v-card v-for="article in paginatedArticles" :key="article._id" class="card mb-3">
       <v-card-title class="d-flex justify-center align-center">
-        <span class="font-weight-medium">{{ article.title }}</span>
+        <span ref="articleTitles" class="font-weight-medium">{{ article.title }}</span>
       </v-card-title>
       <div class="d-flex justify-end mb-3">
         <v-btn
@@ -63,6 +61,7 @@
           >{{ expandedArticles[article._id] ? '顯示更少' : '繼續閱讀' }}</v-btn
         >
       </div>
+
       <v-card-actions class="d-flex justify-end">
         <ToggleLikeArticle
           :article-id="article._id"
@@ -102,10 +101,13 @@
       @refresh="getArticles"
     />
   </div>
+  <div>
+    <v-pagination v-model="currentPage" :length="totalPage" rounded></v-pagination>
+  </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useSnackbar } from 'vuetify-use-dialog'
 import { useI18n } from 'vue-i18n'
 import { useAxios } from '@/composables/axios'
@@ -113,6 +115,8 @@ import AddOrEditArticle from './components/addOrEditArticle.vue'
 import ToggleLikeArticle from './components/toggleLikeArticle.vue'
 import CommentArticle from './components/commentArticle.vue'
 import { useUserStore } from '@/stores/user'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/all'
 
 const user = useUserStore()
 // console.log('目前登入者 ID:', user.id)
@@ -132,6 +136,24 @@ const commentDialogVisible = ref(false)
 const selectedArticleId = ref(null)
 // 繼續閱讀
 const expandedArticles = ref({})
+// gsap
+const titleRef = ref(null)
+// 因為 article title 是由多個 DOM 組成,所以要寫複數
+const articleTitles = ref(null)
+
+// pagination
+const ITEMS_PER_PAGE = 2
+const currentPage = ref(1)
+const totalPage = computed(() => Math.ceil(articles.value.length / ITEMS_PER_PAGE))
+const paginatedArticles = computed(() => {
+  // 第一頁 ( 1 - 1 ) * 2 = 0  // 顯示第 0 ~ 1 篇
+  const start = (currentPage.value - 1) * ITEMS_PER_PAGE
+  // 結束的位置是 start + 要顯示的筆數 // end = 0 + 2
+  const end = start + ITEMS_PER_PAGE
+  // .slice(開始索引, 結束索引)
+  // 不包含結束索引
+  return articles.value.slice(start, end)
+})
 
 function openCommitDialog(type, articleId) {
   if (type === 'comment') {
@@ -145,7 +167,7 @@ const getArticles = async () => {
     const { data } = await apiAuth.get('/article')
     console.log(
       '後端拿到的文章列表',
-      data.result.map((a) => a._id),
+      data.result.map((article) => article._id),
     )
     articles.value.splice(0)
     articles.value.push(...data.result)
@@ -183,7 +205,7 @@ const deleteArticle = async (articleId) => {
   console.log('要刪除的 id:', articleId)
   console.log(
     '目前列表：',
-    articles.value.map((a) => a._id),
+    articles.value.map((article) => article._id),
   )
   try {
     await apiAuth.delete(`/article/${articleId}`)
@@ -228,6 +250,44 @@ onMounted(async () => {
     }
   }
 })
+
+// gsap
+onMounted(async () => {
+  // 等文章載入了再啟動動畫
+  await getArticles()
+  gsap.registerPlugin(ScrollTrigger)
+
+  const el = titleRef.value
+  const chars = el.textContent.split('')
+  el.innerHTML = chars.map((char) => `<span class="char">${char}</span>`).join('')
+
+  gsap.from('.char', {
+    opacity: 0,
+    y: 20,
+    stagger: 0.05,
+    duration: 1,
+    ease: 'power2.out',
+  })
+
+  // 處理每個 articleTitle
+  articleTitles.value.forEach((el) => {
+    const chars = el.textContent.split('')
+    el.innerHTML = chars.map((char) => `<span class="char2">${char}</span>`).join('')
+
+    gsap.from(el.querySelectorAll('.char2'), {
+      opacity: 0,
+      y: 50,
+      duration: 0.3,
+      stagger: 0.03,
+      ease: 'power2.in',
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 80%',
+        toggleActions: 'play reset play none',
+      },
+    })
+  })
+})
 </script>
 
 <style scoped>
@@ -245,7 +305,7 @@ body {
 .card {
   height: auto;
   padding: 10px;
-  background: linear-gradient(135deg, #ebe6ea 30%, #f1cef2 60%, #ecd1f2 80%);
+  background: linear-gradient(180deg, #f5ebf1 30%, #ead4e8 80%);
 }
 .image-container {
   display: flex;
@@ -292,5 +352,9 @@ body {
   justify-content: end;
   text-decoration: underline;
   color: rgb(133, 130, 123);
+}
+
+.char {
+  display: inline-block;
 }
 </style>

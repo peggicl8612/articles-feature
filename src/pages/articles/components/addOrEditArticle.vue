@@ -54,6 +54,7 @@ import { useI18n } from 'vue-i18n'
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 import { useAxios } from '@/composables/axios'
+// import { FileRecord } from 'vue-file-agent'
 
 const { t } = useI18n()
 const { apiAuth } = useAxios()
@@ -80,53 +81,6 @@ const showDialog = ref(false)
 const dialogMode = ref('add')
 const currentEditId = ref('')
 
-// 監聽 props 變化
-watch(
-  () => props.show,
-  (newVal) => {
-    showDialog.value = newVal
-  },
-)
-
-watch(
-  () => props.mode,
-  (newVal) => {
-    dialogMode.value = newVal
-  },
-)
-
-watch(
-  () => props.article,
-  (newVal) => {
-    if (newVal && Object.keys(newVal).length > 0) {
-      currentEditId.value = newVal._id || newVal.id || ''
-      setFieldValue('title', newVal.title)
-      setFieldValue('content', newVal.content)
-    }
-    if (newVal.image) {
-      fileRecords.value = [
-        {
-          name: '已上傳圖片',
-          type: 'image/jpeg',
-          url: newVal.image,
-          source: 'server',
-          id: 'existing-image',
-        },
-      ]
-    }
-  },
-)
-
-// 監聽 dialog 狀態變化
-watch(showDialog, (newVal) => {
-  if (!newVal) {
-    emit('close')
-    resetForm()
-    fileRecords.value = []
-    rawFileRecords.value = []
-  }
-})
-
 const schema = yup.object({
   title: yup.string().required(t('api.articleTitleRequired')),
   content: yup.string().required(t('api.articleContentRequired')),
@@ -146,6 +100,16 @@ const content = useField('content')
 const fileAgent = ref(null)
 const fileRecords = ref([])
 const rawFileRecords = ref([])
+
+/* const existImage = (imageUrl) => {
+  const fileRecord = new FileRecord({
+    name: '已上傳圖片',
+    size: 123456,
+    type: 'image/jpeg',
+    url: imageUrl,
+  })
+  fileRecords.value = [fileRecord]
+} */
 
 const closeDialog = () => {
   showDialog.value = false
@@ -212,4 +176,55 @@ const submit = handleSubmit(async (values) => {
     })
   }
 })
+// 監聽 props 變化
+watch(
+  () => props.show,
+  (newVal) => {
+    showDialog.value = newVal
+  },
+)
+
+watch(
+  () => props.mode,
+  (newVal) => {
+    dialogMode.value = newVal
+  },
+)
+
+watch(
+  () => props.article,
+  (newVal) => {
+    if (newVal && Object.keys(newVal).length > 0) {
+      currentEditId.value = newVal._id || newVal.id || ''
+      setFieldValue('title', newVal.title)
+      setFieldValue('content', newVal.content)
+    }
+    if (newVal.image) {
+      fileRecords.value = [
+        {
+          name: '已上傳圖片',
+          type: 'image/jpeg',
+          url: newVal.image,
+          source: 'server',
+          id: 'existing-image',
+        },
+      ]
+    }
+  },
+)
+
+// 監聽 dialog 狀態變化
+watch(showDialog, (newVal) => {
+  if (!newVal) {
+    emit('close')
+    resetForm()
+    fileRecords.value = []
+    rawFileRecords.value = []
+  }
+})
+/* onMounted(() => {
+  if (isEditMode.value && article.value.imageUrl) {
+    existImage(articles.value.imageUrl)
+  }
+}) */
 </script>
